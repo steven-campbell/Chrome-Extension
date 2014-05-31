@@ -2,49 +2,55 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
     //get the new grades as HTML elements
     var newGrades = getGrades();
   
-    //if the old grades have been stored, compare them against the new grades
-    if(localStorage.grades) {
-      var oldGrades = JSON.parse(localStorage.grades);
-      
-      //iterate through each grade
-      oldGrades.forEach(function(grade, index) {
-          var newGrade = getGrade(newGrades[index])
-          //if the grade has changed
-          if(grade !== newGrade) {
-              if(grade > newGrade) {
-                  newGrades[index].style.color = 'red';
-                  newGrades[index].title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
-              } else {
-                  newGrades[index].style.color = 'green';  
-                  newGrades[index].title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
-              }
-          }
-      });
-    }
+	chrome.storage.sync.get('grades', function(data){
+		var oldGrades = data.grades;
+	
+		//iterate through each grade
+		oldGrades.forEach(function(grade, index) {
+			var newGrade = getGrade(newGrades[index]);
+			//if the grade has changed
+			if(grade !== newGrade) {
+				if(grade > newGrade) {
+					newGrades[index].style.color = 'red';
+					newGrades[index].title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
+				} else {
+					newGrades[index].style.color = 'green';  
+					newGrades[index].title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
+				}
+			}
+		});
+	});
   
-    //finally, store the grades in local storage
+    //finally, save the grades
     storeGrades(newGrades);
 }
 
 //Returns the elements containing the grades
 function getGrades() { 
-    return document.querySelectorAll('td+td > table');
- }
+	return document.querySelectorAll('td+td > table');
+}
 
 //store the grades from the elements into local storage
 function storeGrades(elems) {
     var grades = [];
     for(var x = 0; x < elems.length; x++) {
-       grades[x] = getGrade(elems[x]);
+		grades[x] = getGrade(elems[x]);
     }
-    localStorage.grades = JSON.stringify(grades);
+	
+	//stores the current grades
+    chrome.storage.sync.set({'grades': grades});
 }
 
- //gets the grade from the element, or returns an 'x' if there is no grade
- function getGrade(element) {
-    return parseFloat(element.innerText, 10) || 'x';
- }
+//gets the grade from the element, or returns an 'x' if there is no grade
+function getGrade(element) {
+	return parseFloat(element.innerText, 10) || 'x';
+}
 
 function round(num) {
-  return Math.round(num * 10) / 10;
+    return Math.round(num * 10) / 10;
+}
+
+//gets the current student ID
+function getID() {
+	return location.href.substring(location.href.indexOf('studentid=') + 10, location.href.indexOf('studentid=') + 16);
 }
