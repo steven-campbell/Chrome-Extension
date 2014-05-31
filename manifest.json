@@ -2,8 +2,9 @@
     "manifest_version": 2,
 
     "name": "Genesis Grade Checker",
+    "short_name": "Grade Checker",
     "description": "Easily check whether your grades went up or down.",
-    "version": "1.0",
+    "version": "1.1",
 
     "permissions": ["activeTab", "storage", "http://*/", "https://*/"],
     
