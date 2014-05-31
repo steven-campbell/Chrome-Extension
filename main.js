@@ -13,10 +13,10 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
           if(grade !== newGrade) {
               if(grade > newGrade) {
                   newGrades[index].style.color = 'red';
-                  newGrades[index].title = 'Previous grade: ' + grade + ' (down by ' + round(Math.abs(newGrade - grade)) + ' points)';
+                  newGrades[index].title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
               } else {
                   newGrades[index].style.color = 'green';  
-                  newGrades[index].title = 'Previous grade: ' + grade + ' (up by ' + round(Math.abs(grade - newGrade)) + ' points)';
+                  newGrades[index].title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
               }
           }
       });
