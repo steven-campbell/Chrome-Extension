@@ -1,0 +1,20 @@
+{
+    "manifest_version": 2,
+
+    "name": "Genesis Grade Checker",
+    "description": "Easily check whether your grades went up or down.",
+    "version": "1.0",
+
+    "permissions": ["activeTab", "http://*/", "https://*/"],
+    
+    "content_scripts": [
+        {
+            "matches": ["*://*.lrhsd.org/*"],
+            "js": ["main.js"]
+        }
+    ],
+
+    "icons": { "16": "genesis16.png",
+               "48": "genesis48.png",
+               "128": "genesis128.png" }
+}
