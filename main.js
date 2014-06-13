@@ -40,9 +40,9 @@ function storeGrades(elems) {
     }
 	
 	//stores the current grades
-    var data = {};
-    data['grades' + getID()] = grades;
-    chrome.storage.sync.set(data);
+    var sendingData = {};
+    sendingData['grades' + getID()] = grades;
+    chrome.storage.sync.set(sendingData);
 }
 
 //gets the grade from the element, or returns an 'x' if there is no grade
