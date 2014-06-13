@@ -1,10 +1,10 @@
 if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=') !== -1) {
     //get the new grades as HTML elements
     var newGrades = getGrades();
-  
-	chrome.storage.sync.get('grades', function(data){
-		var oldGrades = data.grades;
-	
+
+	chrome.storage.sync.get('grades' + getID(), function(data){
+		var oldGrades = data[grades + getID()];
+
 		//iterate through each grade
 		oldGrades.forEach(function(grade, index) {
 			var element = newGrades[index];
@@ -15,14 +15,14 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
 					element.style.color = 'red';
 					element.title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
 				} else {
-					element.style.color = 'green';  
+					element.style.color = 'green';
 					element.title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
 				}
 				element.style.fontWeight = 'bold';
 			}
 		});
 	});
-  
+
     //finally, save the grades
     storeGrades(newGrades);
 }
@@ -40,7 +40,9 @@ function storeGrades(elems) {
     }
 	
 	//stores the current grades
-    chrome.storage.sync.set({'grades': grades});
+    var data = {};
+    data['grades' + getID()] = grades;
+    chrome.storage.sync.set(data);
 }
 
 //gets the grade from the element, or returns an 'x' if there is no grade
