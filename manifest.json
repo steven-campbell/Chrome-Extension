@@ -4,7 +4,7 @@
     "name": "Genesis Grade Checker",
     "short_name": "Grade Checker",
     "description": "Easily check whether your grades went up or down.",
-    "version": "1.3.3",
+    "version": "1.4",
 
     "permissions": ["activeTab", "storage", "http://*/", "https://*/"],
     
