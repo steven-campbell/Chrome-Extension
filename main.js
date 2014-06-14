@@ -34,15 +34,15 @@ function getGrades() {
 
 //store the grades from the elements into local storage
 function storeGrades(elems) {
-    var grades = [];
-    for(var x = 0; x < elems.length; x++) {
+	var grades = [];
+	for(var x = 0; x < elems.length; x++) {
 		grades[x] = getGrade(elems[x]);
-    }
+	}
 	
 	//stores the current grades
-    var sendingData = {};
-    sendingData['grades' + getID()] = grades;
-    chrome.storage.sync.set(sendingData);
+    	var sendingData = {};
+	sendingData['grades' + getID()] = grades;
+	chrome.storage.sync.set(sendingData);
 }
 
 //gets the grade from the element, or returns an 'x' if there is no grade
@@ -51,7 +51,7 @@ function getGrade(element) {
 }
 
 function round(num) {
-    return Math.round(num * 10) / 10;
+	return Math.round(num * 10) / 10;
 }
 
 //gets the current student ID
