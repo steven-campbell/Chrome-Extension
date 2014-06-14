@@ -2,7 +2,7 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
     //get the new grades as HTML elements
     var newGrades = getGrades();
 
-	chrome.storage.sync.get('grades' + getID(), function(data){
+	chrome.storage.sync.get(('grades' + getID()), function(data){
 		var oldGrades = data[grades + getID()];
 
 		//iterate through each grade
