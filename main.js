@@ -1,30 +1,34 @@
 if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=') !== -1) {
     //get the new grades as HTML elements
     var newGrades = getGrades();
-
-	chrome.storage.sync.get('grades' + getID(), function(data){
-		var oldGrades = data['grades' + getID()];
-
-		//iterate through each grade
-		oldGrades.forEach(function(grade, index) {
-			var element = newGrades[index];
-			var newGrade = getGrade(element);
-			//if the grade has changed
-			if(grade !== newGrade) {
-				if(grade > newGrade) {
-					element.style.color = 'red';
-					element.title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
-				} else {
-					element.style.color = 'green';
-					element.title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
+	
+	try {
+		chrome.storage.sync.get('grades' + getID(), function(data){
+			var oldGrades = data['grades' + getID()];
+	
+			//iterate through each grade
+			oldGrades.forEach(function(grade, index) {
+				var element = newGrades[index];
+				var newGrade = getGrade(element);
+				//if the grade has changed
+				if(grade !== newGrade) {
+					if(grade > newGrade) {
+						element.style.color = 'red';
+						element.title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
+					} else {
+						element.style.color = 'green';
+						element.title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
+					}
+					element.style.fontWeight = 'bold';
 				}
-				element.style.fontWeight = 'bold';
-			}
-		});
-	});
+			});
+		});	
+	} catch(e) {
+		//first time a certain student's grades are loaded
+	}
 
-    //finally, save the grades
-    storeGrades(newGrades);
+    	//finally, save the grades
+    	storeGrades(newGrades);
 }
 
 //Returns the elements containing the grades
