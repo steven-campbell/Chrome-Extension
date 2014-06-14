@@ -56,5 +56,6 @@ function round(num) {
 
 //gets the current student ID
 function getID() {
-	return location.href.substring(location.href.indexOf('studentid=') + 10, location.href.indexOf('studentid=') + 16);
+	var id = location.href.indexOf('studentid=');
+	return location.href.substring(id + 10, id + 16);
 }
