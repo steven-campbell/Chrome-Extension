@@ -3,8 +3,8 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
     var newGrades = getGrades();
 
     try {
-        chrome.storage.sync.get('grades' + getID() + getMP(), function(data){
-            var oldGrades = data['grades' + getID() + getMP()];
+        chrome.storage.sync.get(getStorageName(), function(data){
+            var oldGrades = data[getStorageName()];
 
             //iterate through each grade
             oldGrades.forEach(function(grade, index) {
@@ -45,7 +45,7 @@ function storeGrades(elems) {
 
     //stores the current grades
     var sendingData = {};
-    sendingData['grades' + getID() + getMP()] = grades;
+    sendingData[getStorageName()] = grades;
     chrome.storage.sync.set(sendingData);
 }
 
@@ -64,8 +64,12 @@ function getID() {
     return location.href.substring(id + 10, id + 16);
 }
 
-// gets the current marking period
+//gets the current marking period
 function getMP() {
-    var id = location.href.indexOf('mpToView=');
-    return location.href.substring(id + 11, id + 12);
+    return document.querySelector('select.fieldvalue > option[selected]').innerText.substr(2, 1);
+}
+
+//gets the key in the key/value pair
+function getStorageName() {
+    return 'grades' + getID() + getMP();
 }
