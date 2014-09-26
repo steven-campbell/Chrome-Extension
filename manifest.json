@@ -4,10 +4,10 @@
     "name": "Genesis Grade Checker",
     "short_name": "Grade Checker",
     "description": "Easily check whether your grades went up or down.",
-    "version": "1.4.1",
+    "version": "1.4.3",
 
     "permissions": ["activeTab", "storage", "http://*/", "https://*/"],
-    
+
     "content_scripts": [
         {
             "matches": ["*://*.lrhsd.org/*"],
@@ -15,9 +15,9 @@
         }
     ],
 
-    "icons": { 
-	    "16": "genesis16.png",
-	    "48": "genesis48.png",
-	    "128": "genesis128.png"
+    "icons": {
+        "16": "genesis16.png",
+        "48": "genesis48.png",
+        "128": "genesis128.png"
     }
 }
