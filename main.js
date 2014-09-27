@@ -3,12 +3,17 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
     var newGrades = getGrades();
     var oldGrades, olderGrades;
 
-    try {
-        //get the previous grades and the grades before those
-        chrome.storage.sync.get([getStorageName(1), getStorageName(2)], function(grades){
-            oldGrades = grades[getStorageName(1)];
-            olderGrades = grades[getStorageName(2)];
+    var storageName1 = getStorageName(1),
+        storageName2 = getStorageName(2);
 
+    //get the previous grades and the grades before those
+    chrome.storage.sync.get([storageName1, storageName2], function(grades) {
+        oldGrades = grades[storageName1];
+        olderGrades = grades[storageName2];
+
+        if(!oldGrades[storageName1] || !olderGrades[storageName2]) {
+            oldGrades = olderGrades = initializeGrades(newGrades);
+        } else {
             //check if the grades have changed
             if(gradesChanged(oldGrades, newGrades)) {
                 //Have the older grades match the newer ones
@@ -18,16 +23,20 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
             }
 
             compareGrades(olderGrades, newGrades);
-        });
-    } catch(e) {
-        //first time a certain student's grades are loaded
-        oldGrades = olderGrades = newGrades.map(function(grade) {
-            return getGrade(grade);
-        });
-    }
+        }
 
-    //finally, save the grades
-    storeGrades(olderGrades, newGrades);
+        //finally, save the grades
+        storeGrades(oldGrades, newGrades);
+    });
+}
+
+//set up both arrays - usually called on the first time running the extension
+function initializeGrades(newGrades) {
+    var grades = [];
+    for(var x = 0; x < newGrades.length; x++) {
+        grades.push(newGrades[x]);
+    }
+    return grades;
 }
 
 //compare the old grades against the new, and update the DOM accordingly
@@ -97,8 +106,8 @@ function round(num) {
 
 //gets the current student ID
 function getID() {
-    var id = location.href.indexOf('studentid=');
-    return location.href.substr(id + id.length, 6);
+    var id = 'studentid=';
+    return location.href.substr(location.href.indexOf(id) + id.length, 6);
 }
 
 //gets the current marking period
