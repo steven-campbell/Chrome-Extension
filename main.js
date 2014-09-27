@@ -6,12 +6,15 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
     var storageName1 = getStorageName(1),
         storageName2 = getStorageName(2);
 
+    //used for debugging
+    //chrome.storage.sync.clear();
+
     //get the previous grades and the grades before those
     chrome.storage.sync.get([storageName1, storageName2], function(grades) {
         oldGrades = grades[storageName1];
         olderGrades = grades[storageName2];
 
-        if(!oldGrades[storageName1] || !olderGrades[storageName2]) {
+        if(!oldGrades || !olderGrades) {
             oldGrades = olderGrades = initializeGrades(newGrades);
         } else {
             //check if the grades have changed
