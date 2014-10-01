@@ -20,8 +20,11 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
             //check if the grades have changed
             if(gradesChanged(oldGrades, newGrades)) {
                 //Have the older grades match the newer ones
-                olderGrades = olderGrades.map(function(grade, index) {
-                    return oldGrades[index];
+                olderGrades = oldGrades;
+
+                //Have the newer ones match the current ones
+                oldGrades = oldGrades.map(function(grade, index) {
+                    return getGrade(newGrades[index]);
                 });
             }
 
@@ -29,7 +32,7 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
         }
 
         //finally, save the grades
-        storeGrades(oldGrades, newGrades);
+        storeGrades(olderGrades, newGrades);
     });
 }
 
