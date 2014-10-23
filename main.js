@@ -1,48 +1,31 @@
 if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=') !== -1) {
+    var DEBUG = false;
+
     //get the new grades as HTML elements
     var newGrades = getGrades();
-    var oldGrades, olderGrades;
+    var oldGrades;
 
-    var storageName1 = getStorageName(1),
-        storageName2 = getStorageName(2);
+    var storageName = getStorageName();
 
     //used for debugging
     //chrome.storage.sync.clear();
 
-    //get the previous grades and the grades before those
-    chrome.storage.sync.get([storageName1, storageName2], function(grades) {
-        oldGrades = grades[storageName1];
-        olderGrades = grades[storageName2];
+    if(DEBUG) {
+        oldGrades = JSON.parse(localStorage.grades) || [];
+        compareGrades(oldGrades, newGrades);
+        storeGrades(oldGrades, newGrades);
+    } else {
+        //get the previous grades and the grades before those
+        chrome.storage.sync.get(storageName, function(grades) {
+            oldGrades = grades[storageName] || [];
 
-        if(!oldGrades || !olderGrades) {
-            oldGrades = olderGrades = initializeGrades(newGrades);
-        } else {
-            //check if the grades have changed
-            if(gradesChanged(oldGrades, newGrades)) {
-                //Have the older grades match the newer ones
-                olderGrades = oldGrades;
+            //compare the old against the new, and change the DOM if necessary
+            compareGrades(oldGrades, newGrades);
 
-                //Have the newer ones match the current ones
-                oldGrades = oldGrades.map(function(grade, index) {
-                    return getGrade(newGrades[index]);
-                });
-            }
-
-            compareGrades(olderGrades, newGrades);
-        }
-
-        //finally, save the grades
-        storeGrades(olderGrades, newGrades);
-    });
-}
-
-//set up both arrays - usually called on the first time running the extension
-function initializeGrades(newGrades) {
-    var grades = [];
-    for(var x = 0; x < newGrades.length; x++) {
-        grades.push(newGrades[x]);
+            //finally, save the grades
+            storeGrades(oldGrades, newGrades);
+        });
     }
-    return grades;
 }
 
 //compare the old grades against the new, and update the DOM accordingly
@@ -51,31 +34,32 @@ function compareGrades(old, current) {
     old.forEach(function(grade, index) {
         //the element representing the grade
         var element = current[index];
+
         //the value of the grade represented by element
         var newGrade = getGrade(element);
 
         //if the grade has changed
         if(grade !== newGrade) {
             if(grade > newGrade) {
-                element.style.color = 'red';
+                element = setColor(element, 'red');
                 element.title = 'Previous grade: ' + grade + ' (down by ' + round(grade - newGrade) + ' points)';
             } else {
-                element.style.color = 'green';
+                element = setColor(element, 'green');
                 element.title = 'Previous grade: ' + grade + ' (up by ' + round(newGrade - grade) + ' points)';
             }
+
             element.style.fontWeight = 'bold';
         }
     });
 }
 
-//returns whether or not the grades have changed since last page visit
-function gradesChanged(old, current) {
-    old.forEach(function(grade, index) {
-        if(grade !== getGrade(current[index])) {
-            return true;
-        }
-    });
-    return false;
+//since simply setting the color doesn't work anymore, this workaround sets the color for each td in the table
+function setColor(element, color) {
+    var children = element.children[0].children[0].children;
+    for(var x = 0; x < children.length; x++) {
+        children[x].style.color = color;
+    }
+    return element;
 }
 
 //returns the elements containing the grades
@@ -86,18 +70,22 @@ function getGrades() {
 //store the grades from the elements into local storage
 function storeGrades(old, elems) {
     var grades = [];
-    for(var x = 0; x < elems.length; x++) {
-        grades[x] = getGrade(elems[x]);
-    }
+
+    [].slice.call(elems).forEach(function(elem, index) {
+        grades[index] = getGrade(elem);
+    });
 
     //stores the current grades
     var sendingData = {};
 
     //update the newer grades
-    sendingData[getStorageName(1)] = grades;
-    sendingData[getStorageName(2)] = old;
+    sendingData[getStorageName()] = old;
 
-    chrome.storage.sync.set(sendingData);
+    if(DEBUG) {
+        localStorage.grades = JSON.stringify(grades);
+    } else {
+        chrome.storage.sync.set(sendingData);
+    }
 }
 
 //gets the grade from the element, or returns an 'x' if there is no grade
@@ -107,7 +95,7 @@ function getGrade(element) {
 
 //rounds num to the nearest tenth
 function round(num) {
-    return Math.round(num * 10) / 10;
+    return ~~(num * 10) / 10;
 }
 
 //gets the current student ID
@@ -124,6 +112,6 @@ function getMP() {
 //gets the key in the key/value pair
 //if num is 1, the old grades will be returned
 //if num is 2, the older grades will be returned
-function getStorageName(num) {
-    return 'grades' + num + getID() + getMP();
+function getStorageName() {
+    return 'grades' + getID() + getMP();
 }
