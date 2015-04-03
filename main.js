@@ -11,7 +11,11 @@ if(location.href.indexOf('.lrhsd.org/genesis/parents?module=gradebook&studentid=
     //chrome.storage.sync.clear();
 
     if(DEBUG) {
-        oldGrades = JSON.parse(localStorage.grades) || [];
+        if(localStorage.grades) {
+            oldGrades = JSON.parse(localStorage.grades)
+        } else {
+            oldGrades = [];
+        }
         compareGrades(oldGrades, newGrades);
         storeGrades(oldGrades, newGrades);
     } else {
